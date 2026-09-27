@@ -1,0 +1,88 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: enigma_homol
+      POSTGRES_USER: enigma
+      POSTGRES_PASSWORD: enigma_homol
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U enigma -d enigma_homol"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - pg_homol:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4:9
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ${DOCKER_IMAGE:-jogo-enigma-api}:${IMAGE_TAG:-local}
+    environment:
+      SPRING_PROFILES_ACTIVE: homol
+      DB_URL: jdbc:postgresql://postgres:5432/enigma_homol
+      DB_USER: enigma
+      DB_PASSWORD: enigma_homol
+    ports:
+      - "${API_PORT:-8081}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  bff:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      API_URL: http://api:8080
+    ports:
+      - "${BFF_PORT:-3000}:3000"
+    depends_on:
+      - api
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "${PROMETHEUS_PORT:-9091}:9090"
+    depends_on:
+      - api
+
+  grafana:
+    image: grafana/grafana:latest
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    ports:
+      - "${GRAFANA_PORT:-3001}:3000"
+    depends_on:
+      - prometheus
+
+  cypress:
+    image: cypress/included:14.5.4
+    profiles: ["e2e"]
+    working_dir: /e2e
+    environment:
+      CYPRESS_BASE_URL: http://bff:3000
+    volumes:
+      - ./frontend:/e2e
+    depends_on:
+      - bff
+    entrypoint: ["cypress", "run"]
+
+volumes:
+  pg_homol:

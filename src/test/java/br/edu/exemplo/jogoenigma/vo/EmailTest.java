@@ -1,0 +1,1 @@
+package br.edu.exemplo.jogoenigma.vo; import org.junit.jupiter.api.Test; import static org.junit.jupiter.api.Assertions.*; class EmailTest { @Test void deveValidarEmail(){assertEquals("a@b.com",new Email("a@b.com").valor());} @Test void deveRejeitarEmail(){assertThrows(IllegalArgumentException.class,()->new Email("invalido"));}}

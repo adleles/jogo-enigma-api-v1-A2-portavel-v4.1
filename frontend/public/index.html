@@ -1,0 +1,9 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Jogo Enigma</title><style>body{font-family:Arial;max-width:760px;margin:40px auto}input,button{padding:10px;margin:4px}li{margin:8px}</style></head><body><h1>Jogo Enigma</h1><p>Front → BFF Node.js → API Spring Boot → PostgreSQL</p><form id="f"><input id="nome" placeholder="Nome" required><input id="email" type="email" placeholder="E-mail" required><input id="pontos" type="number" min="0" max="100" value="0"><button>Cadastrar</button></form><p id="msg"></p><h2>Participantes</h2><ul id="lista"></ul><script>async function listar(){let r=await fetch('/bff/participantes');let d=await r.json();lista.innerHTML=d.map(x=>`<li>${x.nome} - ${x.email} - ${x.pontos} - ${x.nivel}</li>`).join('')} f.onsubmit=async e=>{e.preventDefault();let r=await fetch('/bff/participantes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome:nome.value,email:email.value,pontos:+pontos.value})});msg.textContent=r.ok?'Cadastrado com sucesso': 'Erro no cadastro';
+    if (r.ok) {
+        f.reset();
+        await listar()
+    }
+};
+listar();</script>
+</body>
+</html>

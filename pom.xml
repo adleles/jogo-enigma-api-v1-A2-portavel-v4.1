@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- =========================================================
+       SPRING BOOT
+       ========================================================= -->
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.5.5</version>
+    <relativePath/>
+  </parent>
+
+  <!-- =========================================================
+       IDENTIFICAÇÃO DO PROJETO
+       ========================================================= -->
+  <groupId>br.edu.exemplo</groupId>
+  <artifactId>jogo-enigma-api</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <name>jogo-enigma-api</name>
+
+  <description>
+    API do Jogo Enigma - Spring Boot, PostgreSQL,
+    JUnit 5, Mockito, Testcontainers, JaCoCo e PMD
+  </description>
+
+  <!-- =========================================================
+       PROPRIEDADES
+       ========================================================= -->
+  <properties>
+
+    <!-- Java -->
+    <java.version>17</java.version>
+
+    <!-- Testcontainers -->
+    <testcontainers.version>1.21.3</testcontainers.version>
+
+    <!-- Qualidade -->
+    <jacoco.version>0.8.13</jacoco.version>
+    <pmd.plugin.version>3.26.0</pmd.plugin.version>
+
+  </properties>
+
+
+  <!-- =========================================================
+       DEPENDÊNCIAS
+       ========================================================= -->
+  <dependencies>
+
+    <!-- =====================================================
+         SPRING BOOT / API REST
+         ===================================================== -->
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+
+
+    <!-- =====================================================
+         JPA / PERSISTÊNCIA
+         ===================================================== -->
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+
+
+    <!-- =====================================================
+         VALIDAÇÃO
+         ===================================================== -->
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+
+
+    <!-- =====================================================
+         ACTUATOR
+         Health Check + Prometheus
+         ===================================================== -->
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+
+
+    <!-- =====================================================
+         PROMETHEUS...
+         ===================================================== -->
+
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-registry-prometheus</artifactId>
+    </dependency>
+
+
+    <!-- =====================================================
+         POSTGRESQL
+         ===================================================== -->
+
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+
+    <!-- =====================================================
+         TESTES SPRING / JUNIT 5 / MOCKITO
+         ===================================================== -->
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+
+    <!-- =====================================================
+         TESTCONTAINERS
+         Repository testado com PostgreSQL real
+         ===================================================== -->
+
+    <!-- Integra @ServiceConnection do Spring Boot com Testcontainers -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-testcontainers</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>${testcontainers.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>${testcontainers.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+
+  </dependencies>
+
+
+  <!-- =========================================================
+       BUILD.....
+       ========================================================= -->
+  <build>
+
+    <plugins>
+
+      <!-- =================================================
+           SPRING BOOT
+           Geração do JAR executável
+           ================================================= -->
+
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+
+
+      <!-- =================================================
+           MAVEN COMPILER
+           ================================================= -->
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+
+        <configuration>
+          <release>${java.version}</release>
+        </configuration>
+
+      </plugin>
+
+
+      <!-- =================================================
+           SUREFIRE
+           JUnit 5
+           ================================================= -->
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.5.3</version>
+
+        <configuration>
+
+          <useModulePath>false</useModulePath>
+
+        </configuration>
+
+      </plugin>
+
+
+      <!-- =================================================
+           JACOCO
+           Cobertura de testes
+           ================================================= -->
+
+      <plugin>
+
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${jacoco.version}</version>
+
+        <executions>
+
+          <!-- Prepara agente antes dos testes -->
+
+          <execution>
+
+            <id>prepare-agent</id>
+
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+
+          </execution>
+
+
+          <!-- Gera relatório -->
+
+          <execution>
+
+            <id>report</id>
+
+            <phase>test</phase>
+
+            <goals>
+              <goal>report</goal>
+            </goals>
+
+          </execution>
+
+        </executions>
+
+      </plugin>
+
+
+      <!-- =================================================
+           PMD
+           Análise estática
+           ================================================= -->
+
+      <plugin>
+
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <version>${pmd.plugin.version}</version>
+
+        <configuration>
+
+          <targetJdk>${java.version}</targetJdk>
+
+          <printFailingErrors>true</printFailingErrors>
+
+          <failOnViolation>false</failOnViolation>
+
+        </configuration>
+
+      </plugin>
+
+    </plugins>
+
+  </build>
+
+</project>

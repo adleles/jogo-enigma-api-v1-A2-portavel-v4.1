@@ -1,0 +1,1 @@
+package br.edu.exemplo.jogoenigma.dto; import jakarta.validation.Validation; import org.junit.jupiter.api.Test; import static org.junit.jupiter.api.Assertions.*; class ParticipanteRequestTest { @Test void deveDetectarDtoInvalido(){try(var f=Validation.buildDefaultValidatorFactory()){assertFalse(f.getValidator().validate(new ParticipanteRequest("","x",101)).isEmpty());}}}
